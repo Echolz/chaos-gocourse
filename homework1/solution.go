@@ -13,20 +13,19 @@ func Run() {
 		panic("The input was not in the correct format")
 	}
 
+	if m > n {
+		fmt.Println("The second number has to be smaller than the first number")
+	}
+
 	p := findWinner(n, m)
 
 	fmt.Printf("The answer is: %d", p)
-
 }
 
 func findWinner(n, m int) int {
-	return recursiveSolution(n, m) + 1
-}
-
-func recursiveSolution(n, m int) int {
 	if n != 1 {
-		return (recursiveSolution(n-1, m) + m) % n
+		return (findWinner(n-1, m)+m-1)%n + 1
 	}
 
-	return 0
+	return 1
 }
