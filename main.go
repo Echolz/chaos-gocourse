@@ -3,6 +3,7 @@ package main
 import (
 	"github.com/Echolz/chaos-gocourse/homework1"
 	"github.com/Echolz/chaos-gocourse/lab2"
+	"github.com/Echolz/chaos-gocourse/lab3"
 	"log"
 	"os/user"
 )
@@ -13,7 +14,7 @@ func main() {
 
 	//runSecondLab()
 
-	//runThirdLab()
+	runThirdLab()
 }
 
 func runFirstHomework() {
@@ -32,4 +33,8 @@ func runSecondLab() {
 	}
 
 	lab2.Run(u.HomeDir, "sucks.jpg")
+}
+
+func runThirdLab() {
+	lab3.Run()
 }
