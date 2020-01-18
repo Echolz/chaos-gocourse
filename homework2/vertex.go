@@ -1,29 +1,46 @@
 package homework2
 
 import (
-	imagecolor "image/color"
 	"math"
 )
 
-type vertex struct {
-	x float64
-	y float64
+type Vertex struct {
+	X float64
+	Y float64
 }
 
-type coloredVertex struct {
-	vertex
-	color imagecolor.RGBA
+func (v Vertex) abs() float64 {
+	return math.Sqrt(math.Hypot(v.X, v.Y))
 }
 
-func (v vertex) abs() float64 {
-	return math.Sqrt(math.Hypot(v.x, v.y))
+func (v *Vertex) scale(f float64) {
+	v.X = v.X * f
+	v.Y = v.Y * f
 }
 
-func (v *vertex) scale(f float64) {
-	v.x = v.x * f
-	v.y = v.y * f
+func (v Vertex) distance(k Vertex) float64 {
+	return math.Hypot(v.X-k.X, k.Y-v.Y)
 }
 
-func (v vertex) distance(k vertex) float64 {
-	return math.Hypot(k.x-v.x, k.y-v.y)
+func (v *Vertex) translate(vertex Vertex) {
+	v.X = v.X + vertex.X
+	v.Y = v.Y + vertex.Y
+}
+
+func (v *Vertex) rotate(cx, cy, angle float64) {
+	s := math.Sin(angle)
+	c := math.Cos(angle)
+
+	// translate point back to origin:
+	v.X -= cx
+	v.Y -= cy
+
+	// rotate point
+
+	xnew := v.X*c - v.Y*s
+	ynew := v.X*s + v.Y*c
+
+	// translate point back:
+	v.X = xnew + cx
+	v.Y = ynew + cy
 }
