@@ -32,11 +32,6 @@ type path struct {
 	bitMap        [][]color.Color
 }
 
-type pixel struct {
-	x int
-	y int
-}
-
 func NewPath(vertices []Vertex, strokeColor color.Color, fillColor color.Color, width int, height int) DrawablePath {
 	p := &path{vertices: vertices, strokeColor: strokeColor, fillColor: fillColor, width: width, height: height, centralWidth: width / 2, centralHeight: height / 2}
 	p.initBitMap()
@@ -184,9 +179,7 @@ func (p *path) updateBitMap() {
 		intX := int(v.X)
 		intY := int(v.Y)
 
-		if intY > p.height || intX > p.width {
-			continue
-		}
+		intX, intY = setOutOfBounds(intX, intY, p.width, p.height)
 
 		p.bitMap[intY][intX] = p.strokeColor
 	}
@@ -196,6 +189,66 @@ func (p *path) updateBitMap() {
 	}
 
 	line(p.vertices[len(p.vertices)-1], p.vertices[0], p.bitMap, p.strokeColor)
+
+	fillMap(p.bitMap, p.fillColor)
+
+}
+
+func setOutOfBounds(x, y, width, height int) (int, int) {
+	if x > width {
+		x = width - 1
+	}
+
+	if x < 0 {
+		x = 0
+	}
+
+	if y > height {
+		y = height - 1
+	}
+
+	if y < 0 {
+		y = 0
+	}
+
+	return x, y
+}
+
+func fillMap(bitMap [][]color.Color, fillColor color.Color) {
+	var currentCol color.Color
+
+	for i := 0; i < len(bitMap); i++ {
+		for j := 0; j < len(bitMap[0]); j++ {
+			currentCol = bitMap[i][j]
+
+			if currentCol == nil {
+				continue
+			}
+
+			for ; j < len(bitMap[0]); j++ {
+				currentCol = bitMap[i][j]
+				if currentCol == nil {
+					break
+				}
+			}
+
+			for ; j < len(bitMap[0]); j++ {
+				currentCol = bitMap[i][j]
+				if currentCol != nil {
+					break
+				}
+
+				bitMap[i][j] = fillColor
+			}
+
+			for ; j < len(bitMap[0]); j++ {
+				currentCol = bitMap[i][j]
+				if currentCol == nil {
+					break
+				}
+			}
+		}
+	}
 }
 
 func line(origin, endp Vertex, bitMap [][]color.Color, strokeColor color.Color) {
