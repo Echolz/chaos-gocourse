@@ -13,9 +13,8 @@ type Storage interface {
 	DeleteUser(userId int) error
 }
 
-var UID int
-
 type inMemoryStorage struct {
+	UID        int
 	storageMap map[int]User
 }
 
@@ -43,13 +42,13 @@ func (m inMemoryStorage) SortBy(fieldName string) []User {
 }
 
 func (m *inMemoryStorage) CreateUser(userRequest UserRequest) error {
-	newUser, err := createUserFromRequest(userRequest, UID)
+	newUser, err := createUserFromRequest(userRequest, m.UID)
 	if err != nil {
 		return errors.Wrap(err, "invalid user data:")
 	}
 
-	m.storageMap[UID] = newUser
-	UID++
+	m.storageMap[m.UID] = newUser
+	m.UID++
 
 	return nil
 }
