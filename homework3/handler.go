@@ -36,7 +36,25 @@ func (c concreteHandler) SortBy(w http.ResponseWriter, req *http.Request) {
 }
 
 func (c concreteHandler) CreateUser(w http.ResponseWriter, req *http.Request) {
+	w.Header().Set("Content-Type", "application/json")
+	var userRequest UserRequest
 
+	err := json.NewDecoder(req.Body).Decode(&userRequest)
+
+	if err != nil {
+		w.WriteHeader(http.StatusBadRequest)
+		return
+	}
+
+	err = c.storage.createUser(userRequest)
+
+	if err != nil {
+		w.WriteHeader(http.StatusBadRequest)
+		return
+	}
+
+	w.WriteHeader(http.StatusCreated)
+	w.Header().Set("Location", req.URL.String())
 }
 
 func (c concreteHandler) GetUser(w http.ResponseWriter, req *http.Request) {
@@ -65,7 +83,33 @@ func (c concreteHandler) GetUser(w http.ResponseWriter, req *http.Request) {
 }
 
 func (c concreteHandler) UpdateUser(w http.ResponseWriter, req *http.Request) {
-	panic("implement me")
+	w.Header().Set("Content-Type", "application/json")
+	var userRequest UserRequest
+
+	err := json.NewDecoder(req.Body).Decode(&userRequest)
+
+	if err != nil {
+		w.WriteHeader(http.StatusBadRequest)
+		return
+	}
+
+	id, ok := extractId(req)
+
+	if !ok {
+		w.WriteHeader(http.StatusBadRequest)
+		return
+	}
+
+	err = c.storage.updateUser(id, userRequest)
+
+	if err != nil {
+		w.WriteHeader(http.StatusNotFound)
+		return
+	}
+
+	w.WriteHeader(http.StatusOK)
+	w.Header().Set("Location", req.URL.String())
+
 }
 
 func (c concreteHandler) DeleteUser(w http.ResponseWriter, req *http.Request) {
