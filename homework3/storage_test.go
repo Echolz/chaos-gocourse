@@ -16,6 +16,66 @@ func TestInMemoryStorage_AdminInitialValue(t *testing.T) {
 	})
 }
 
+func TestInMemoryStorage_SortBy(t *testing.T) {
+	t.Run("test sorting by different fields", func(t *testing.T) {
+		initialAdmR := UserRequest{
+			Username:  "admin",
+			Password:  "admin",
+			Email:     "admin@admin.com",
+			FirstName: "admin",
+			LastName:  "admin",
+			UserRole:  "admin",
+		}
+		storage := NewStorageWithAdmin(initialAdmR)
+
+		//ID1
+		u1R := UserRequest{
+			Username:  "",
+			Password:  "",
+			Email:     "",
+			FirstName: "bba",
+			LastName:  "",
+			UserRole:  "user",
+		}
+
+		//ID2
+		u2R := UserRequest{
+			Username:  "",
+			Password:  "",
+			Email:     "",
+			FirstName: "aab",
+			LastName:  "",
+			UserRole:  "admin",
+		}
+
+		err := storage.CreateUser(u1R)
+		assert.Nil(t, err)
+
+		err = storage.CreateUser(u2R)
+		assert.Nil(t, err)
+
+		initialAdm, err := createUserFromRequest(initialAdmR, 0)
+		assert.Nil(t, err)
+
+		u1, err := createUserFromRequest(u1R, 1)
+		assert.Nil(t, err)
+
+		u2, err := createUserFromRequest(u2R, 2)
+		assert.Nil(t, err)
+
+		byFirstName := []User{u2, initialAdm, u1}
+		assert.Equal(t, storage.SortBy(byFirstNameString), byFirstName)
+
+		byId := []User{initialAdm, u1, u2}
+		assert.Equal(t, storage.SortBy(""), byId)
+
+		//sorting is not consistent
+		//byRole := []User{initialAdm, u2, u1}
+		//assert.Equal(t, storage.SortBy(byRoleString), byRole)
+
+	})
+}
+
 func TestInMemoryStorage_CreateUser(t *testing.T) {
 	tests := []struct {
 		name       string

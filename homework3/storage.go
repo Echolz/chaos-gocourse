@@ -3,7 +3,10 @@ package homework3
 import (
 	"fmt"
 	"github.com/pkg/errors"
+	"sort"
 )
+
+const startingID = 0
 
 type Storage interface {
 	SortBy(fieldName string) []User
@@ -16,10 +19,37 @@ type Storage interface {
 type inMemoryStorage struct {
 	UID        int
 	storageMap map[int]User
+	userSorter userSorter
+}
+
+func NewStorageWithAdmin(initialAdmin UserRequest) Storage {
+	storage := &inMemoryStorage{
+		UID:        startingID,
+		storageMap: make(map[int]User),
+		userSorter: userSorter{
+			users: nil,
+			by:    byDefault,
+		},
+	}
+
+	err := storage.CreateUser(initialAdmin)
+
+	if err != nil {
+		panic(errors.Wrap(err, "problem with default admin user"))
+	}
+
+	return storage
 }
 
 func NewStorage() Storage {
-	storage := &inMemoryStorage{storageMap: make(map[int]User)}
+	storage := &inMemoryStorage{
+		UID:        startingID,
+		storageMap: make(map[int]User),
+		userSorter: userSorter{
+			users: nil,
+			by:    byDefault,
+		},
+	}
 
 	err := storage.CreateUser(UserRequest{
 		Username:  "admin",
@@ -38,7 +68,13 @@ func NewStorage() Storage {
 }
 
 func (m inMemoryStorage) SortBy(fieldName string) []User {
-	panic("implement me")
+	m.userSorter.users = m.getAllCurrentUsers()
+
+	m.userSorter.by = stringToSorterFunc(fieldName)
+
+	sort.Sort(m.userSorter)
+
+	return m.userSorter.users
 }
 
 func (m *inMemoryStorage) CreateUser(userRequest UserRequest) error {
@@ -85,6 +121,16 @@ func (m inMemoryStorage) DeleteUser(userId int) error {
 	delete(m.storageMap, userId)
 
 	return nil
+}
+
+func (m inMemoryStorage) getAllCurrentUsers() []User {
+	users := make([]User, 0, len(m.storageMap))
+
+	for _, user := range m.storageMap {
+		users = append(users, user)
+	}
+
+	return users
 }
 
 func createUserFromRequest(request UserRequest, userId int) (User, error) {

@@ -8,7 +8,32 @@ const (
 	adminRoleString   = "admin"
 	userRoleString    = "user"
 	invalidRoleString = "invalid"
+
+	byFirstNameString = "firstName"
+	byRoleString      = "role"
 )
+
+var byDefault = func(u1, u2 User) bool {
+	return u1.ID < u2.ID
+}
+
+var byFirstName = func(u1, u2 User) bool {
+	return u1.FirstName < u2.FirstName
+}
+
+var byRole = func(u1, u2 User) bool {
+	return u1.Role < u2.Role
+}
+
+func stringToSorterFunc(fieldName string) by {
+	switch fieldName {
+	case byFirstNameString:
+		return byFirstName
+	case byRoleString:
+		return byRole
+	}
+	return byDefault
+}
 
 func (r Role) String() string {
 	switch r {
@@ -54,7 +79,26 @@ type UserRequest struct {
 	Email     string
 	FirstName string
 	LastName  string
-	UserRole      string
+	UserRole  string
+}
+
+type by func(user1, user2 User) bool
+
+type userSorter struct {
+	users []User
+	by    by
+}
+
+func (u userSorter) Len() int {
+	return len(u.users)
+}
+
+func (u userSorter) Less(i, j int) bool {
+	return u.by(u.users[i], u.users[j])
+}
+
+func (u userSorter) Swap(i, j int) {
+	u.users[i], u.users[j] = u.users[j], u.users[i]
 }
 
 func (u User) String() string {
