@@ -5,12 +5,12 @@ import "fmt"
 type Role int
 
 const (
-	adminRoleString   = "admin"
-	userRoleString    = "user"
+	AdminRoleString   = "admin"
+	UserRoleString    = "user"
 	invalidRoleString = "invalid"
 
-	byFirstNameString = "firstName"
-	byRoleString      = "role"
+	ByFirstNameString = "firstName"
+	ByRoleString      = "role"
 )
 
 var byDefault = func(u1, u2 User) bool {
@@ -27,9 +27,9 @@ var byRole = func(u1, u2 User) bool {
 
 func stringToSorterFunc(fieldName string) by {
 	switch fieldName {
-	case byFirstNameString:
+	case ByFirstNameString:
 		return byFirstName
-	case byRoleString:
+	case ByRoleString:
 		return byRole
 	}
 	return byDefault
@@ -38,18 +38,18 @@ func stringToSorterFunc(fieldName string) by {
 func (r Role) String() string {
 	switch r {
 	case AdminRole:
-		return adminRoleString
+		return AdminRoleString
 	case UserRole:
-		return userRoleString
+		return UserRoleString
 	}
 	return invalidRoleString
 }
 
 func stringToRole(role string) Role {
 	switch role {
-	case adminRoleString:
+	case AdminRoleString:
 		return AdminRole
-	case userRoleString:
+	case UserRoleString:
 		return UserRole
 	}
 	return InvalidRole

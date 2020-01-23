@@ -64,14 +64,14 @@ func TestInMemoryStorage_SortBy(t *testing.T) {
 		assert.Nil(t, err)
 
 		byFirstName := []User{u2, initialAdm, u1}
-		assert.Equal(t, storage.sortBy(byFirstNameString), byFirstName)
+		assert.Equal(t, storage.sortBy(ByFirstNameString), byFirstName)
 
 		byId := []User{initialAdm, u1, u2}
 		assert.Equal(t, storage.sortBy(""), byId)
 
 		//sorting is not consistent
 		//byRole := []User{initialAdm, u2, u1}
-		//assert.Equal(t, storage.sortBy(byRoleString), byRole)
+		//assert.Equal(t, storage.sortBy(ByRoleString), byRole)
 
 	})
 }
