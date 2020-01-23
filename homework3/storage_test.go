@@ -7,9 +7,9 @@ import (
 
 func TestInMemoryStorage_AdminInitialValue(t *testing.T) {
 	t.Run("test initial admin creation", func(t *testing.T) {
-		storage := NewStorage()
+		storage := newStorage()
 
-		adminUser, err := storage.GetUser(0)
+		adminUser, err := storage.getUser(0)
 		assert.Equal(t, err, nil)
 		assert.Equal(t, adminUser.Role, AdminRole)
 
@@ -26,7 +26,7 @@ func TestInMemoryStorage_SortBy(t *testing.T) {
 			LastName:  "admin",
 			UserRole:  "admin",
 		}
-		storage := NewStorageWithAdmin(initialAdmR)
+		storage := newStorageWithAdmin(initialAdmR)
 
 		//ID1
 		u1R := UserRequest{
@@ -48,10 +48,10 @@ func TestInMemoryStorage_SortBy(t *testing.T) {
 			UserRole:  "admin",
 		}
 
-		err := storage.CreateUser(u1R)
+		err := storage.createUser(u1R)
 		assert.Nil(t, err)
 
-		err = storage.CreateUser(u2R)
+		err = storage.createUser(u2R)
 		assert.Nil(t, err)
 
 		initialAdm, err := createUserFromRequest(initialAdmR, 0)
@@ -64,14 +64,14 @@ func TestInMemoryStorage_SortBy(t *testing.T) {
 		assert.Nil(t, err)
 
 		byFirstName := []User{u2, initialAdm, u1}
-		assert.Equal(t, storage.SortBy(byFirstNameString), byFirstName)
+		assert.Equal(t, storage.sortBy(byFirstNameString), byFirstName)
 
 		byId := []User{initialAdm, u1, u2}
-		assert.Equal(t, storage.SortBy(""), byId)
+		assert.Equal(t, storage.sortBy(""), byId)
 
 		//sorting is not consistent
 		//byRole := []User{initialAdm, u2, u1}
-		//assert.Equal(t, storage.SortBy(byRoleString), byRole)
+		//assert.Equal(t, storage.sortBy(byRoleString), byRole)
 
 	})
 }
@@ -79,13 +79,13 @@ func TestInMemoryStorage_SortBy(t *testing.T) {
 func TestInMemoryStorage_CreateUser(t *testing.T) {
 	tests := []struct {
 		name       string
-		storage    Storage
+		storage    storage
 		user       UserRequest
 		shouldFail bool
 	}{
 		{
 			name:    "create valid user",
-			storage: NewStorage(),
+			storage: newStorage(),
 			user: UserRequest{
 				Username:  "newname",
 				Password:  "1234qwer",
@@ -98,7 +98,7 @@ func TestInMemoryStorage_CreateUser(t *testing.T) {
 		},
 		{
 			name:    "create invalid user",
-			storage: NewStorage(),
+			storage: newStorage(),
 			user: UserRequest{
 				Username:  "newname",
 				Password:  "1234qwer",
@@ -113,7 +113,7 @@ func TestInMemoryStorage_CreateUser(t *testing.T) {
 
 	for _, tc := range tests {
 		t.Run(tc.name, func(t *testing.T) {
-			err := tc.storage.CreateUser(tc.user)
+			err := tc.storage.createUser(tc.user)
 
 			if tc.shouldFail {
 				assert.NotNil(t, err)
@@ -125,7 +125,7 @@ func TestInMemoryStorage_CreateUser(t *testing.T) {
 }
 
 func TestInMemoryStorage_Create_Delete_Update(t *testing.T) {
-	storage := NewStorage()
+	storage := newStorage()
 
 	firstReq := UserRequest{
 		Username:  "echolz",
@@ -135,10 +135,10 @@ func TestInMemoryStorage_Create_Delete_Update(t *testing.T) {
 		LastName:  "echolz",
 		UserRole:  "user",
 	}
-	err := storage.CreateUser(firstReq)
+	err := storage.createUser(firstReq)
 	assert.Nil(t, err)
 
-	firstUser, err := storage.GetUser(1)
+	firstUser, err := storage.getUser(1)
 	assert.Nil(t, err)
 	assert.Equal(t, firstReq.Email, firstUser.Email)
 
@@ -150,16 +150,16 @@ func TestInMemoryStorage_Create_Delete_Update(t *testing.T) {
 		LastName:  "newname",
 		UserRole:  "user",
 	}
-	err = storage.UpdateUser(1, updatedUser)
+	err = storage.updateUser(1, updatedUser)
 	assert.Nil(t, err)
 
-	firstUpdatedUser, err := storage.GetUser(1)
+	firstUpdatedUser, err := storage.getUser(1)
 	assert.Nil(t, err)
 	assert.Equal(t, updatedUser.LastName, firstUpdatedUser.FirstName)
 
-	err = storage.DeleteUser(1)
+	err = storage.deleteUser(1)
 	assert.Nil(t, err)
 
-	_, err = storage.GetUser(1)
+	_, err = storage.getUser(1)
 	assert.NotNil(t, err)
 }
