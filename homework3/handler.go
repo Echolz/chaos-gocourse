@@ -2,6 +2,7 @@ package homework3
 
 import (
 	"encoding/json"
+	"fmt"
 	"github.com/gorilla/mux"
 	"net/http"
 	"strconv"
@@ -25,6 +26,8 @@ func (c concreteHandler) SortBy(w http.ResponseWriter, req *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 	field := req.URL.Query().Get("sortBy")
 
+	fmt.Printf("SORT USERS BY:%s\n", field)
+
 	users := c.storage.sortBy(field)
 
 	err := json.NewEncoder(w).Encode(users)
@@ -38,6 +41,8 @@ func (c concreteHandler) SortBy(w http.ResponseWriter, req *http.Request) {
 func (c concreteHandler) CreateUser(w http.ResponseWriter, req *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 	var userRequest UserRequest
+
+	fmt.Println("CREATE USER")
 
 	err := json.NewDecoder(req.Body).Decode(&userRequest)
 
@@ -61,6 +66,8 @@ func (c concreteHandler) GetUser(w http.ResponseWriter, req *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 
 	v, ok := extractId(req)
+
+	fmt.Printf("GET USER WITH ID: %d\n", v)
 
 	if !ok {
 		w.WriteHeader(http.StatusBadRequest)
@@ -95,6 +102,8 @@ func (c concreteHandler) UpdateUser(w http.ResponseWriter, req *http.Request) {
 
 	id, ok := extractId(req)
 
+	fmt.Printf("UPDATE USER WITH ID: %d\n", id)
+
 	if !ok {
 		w.WriteHeader(http.StatusBadRequest)
 		return
@@ -114,6 +123,8 @@ func (c concreteHandler) UpdateUser(w http.ResponseWriter, req *http.Request) {
 
 func (c concreteHandler) DeleteUser(w http.ResponseWriter, req *http.Request) {
 	id, ok := extractId(req)
+
+	fmt.Printf("DELETE USER WITH ID %d\n", id)
 
 	if !ok {
 		w.WriteHeader(http.StatusBadRequest)
@@ -151,15 +162,5 @@ func extractId(req *http.Request) (int, bool) {
 func NewHandler() Handler {
 	h := &concreteHandler{}
 	h.storage = newStorage()
-
-	h.storage.createUser(UserRequest{
-		Username:  "",
-		Password:  "",
-		Email:     "",
-		FirstName: "aa",
-		LastName:  "",
-		UserRole:  "user",
-	})
-
 	return h
 }

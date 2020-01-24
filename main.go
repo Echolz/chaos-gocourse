@@ -13,9 +13,9 @@ func main() {
 	router := mux.NewRouter()
 	router.HandleFunc("/users/{id}", h.GetUser).Methods(http.MethodGet)
 	router.HandleFunc("/users", h.SortBy).Methods(http.MethodGet)
-	router.HandleFunc("/posts", h.CreateUser).Methods("POST")
-	router.HandleFunc("/posts/{id}", h.UpdateUser).Methods("PUT")
-	router.HandleFunc("/posts/{id}", h.DeleteUser).Methods("DELETE")
+	router.HandleFunc("/users", h.CreateUser).Methods(http.MethodPost)
+	router.HandleFunc("/users/{id}", h.UpdateUser).Methods(http.MethodPut)
+	router.HandleFunc("/users/{id}", h.DeleteUser).Methods(http.MethodDelete)
 	log.Fatal(http.ListenAndServe("localhost:8080", router))
 
 }
